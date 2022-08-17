@@ -6,6 +6,7 @@ import com.zugangliu.finalproject.bean.User;
 import com.zugangliu.finalproject.service.CommunityService;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.boot.system.ApplicationHome;
 import org.springframework.data.relational.core.sql.In;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
@@ -48,7 +49,7 @@ public class CommunityController {
         return "create_comm";
     }
 
-    /**
+    /** @deprecated
      * 目前这个handler只是处理用户上传的图片，而且只是把图片随便放到了一个位置
      * 22/07/22
      * @param commHeader
@@ -69,7 +70,8 @@ public class CommunityController {
     @ResponseBody
     public String createComm(@RequestParam Map<String, Object> params,
                              @RequestPart("cHeaderImg") MultipartFile cHeaderImg,
-                             Model model
+                             Model model,
+                             HttpSession session
     ) throws IOException {
         log.info(params.toString());
 
@@ -79,24 +81,51 @@ public class CommunityController {
         community.setCAbout((String) params.get("cAbout"));
         community.setCRules((String) params.get("cRules"));
 
+        // save comm header image
         if(!cHeaderImg.isEmpty()){
             String originalFilename = cHeaderImg.getOriginalFilename();
-            String staticPath = ClassUtils.getDefaultClassLoader().getResource("static/img/upload").getPath();
+
+            // get directory of .jar
+            ApplicationHome h = new ApplicationHome(getClass());
+            File jarF = h.getSource();
+
+            // create a fold '/upload/comm_header/' to save uploaded images
+            String dirPath = jarF.getParentFile().toString() + "/upload/comm_header/";
+            System.out.println("directory of jar: "+jarF.toString());
+            System.out.println("directory of uploaded images" + dirPath);
+
+            File file = new File(dirPath);
+            if(!file.exists()){
+                file.mkdirs();
+            }
+
+            // write image to hard disc
+            cHeaderImg.transferTo(new File(dirPath + originalFilename));
+
+
+            /*String staticPath = ClassUtils.getDefaultClassLoader().getResource("static/img/upload").getPath();
             String imgPath = "comm_header_img" + File.separator + originalFilename;
             String savePath = staticPath + File.separator + imgPath;
 
-            log.info("comm header img saved to " + savePath);
 
             File saveFile = new File(savePath);
             if(!saveFile.exists()){
                 saveFile.mkdirs();
             }
-
             cHeaderImg.transferTo(saveFile);
-            community.setCHeaderImg("/img/upload/comm_header_img/"+originalFilename);
+            log.info("comm header img saved to " + savePath);*/
+
+            community.setCHeaderImg(originalFilename);
         }
 
         communityService.createComm(community);
+        log.info(Integer.toString(community.getId()));
+
+        // after create a comm, the creator directly join the comm
+        User user = (User) session.getAttribute("user");
+        communityService.joinComm(user, community.getId());
+
+        // return a success code to frontend; plus the community id
         return "200;"+community.getId();
     }
 

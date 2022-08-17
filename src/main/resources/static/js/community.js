@@ -413,10 +413,11 @@ var vue = new Vue({
     },
     mounted(){
         let pathname = window.location.pathname;
-        let commId = pathname.substring(pathname.length-1, pathname.length);
-        this.commId = commId;
+        let paths = pathname.split('/');
+        console.log(paths);
+        this.commId = paths[2];
         //console.log(commId);
-        axios.get('/topics/'+commId+'/'+1)
+        axios.get('/topics/'+this.commId+'/'+1)
             .then(function (response){
                 getTopicList(response);
             })

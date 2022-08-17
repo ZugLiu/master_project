@@ -8,6 +8,7 @@ import com.zugangliu.finalproject.service.CommunityService;
 import com.zugangliu.finalproject.service.UserService;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.boot.system.ApplicationHome;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
 import org.springframework.util.ClassUtils;
@@ -101,6 +102,19 @@ public class UserController {
 
         if(!avatar.isEmpty()){
             String originalFilename = avatar.getOriginalFilename();
+            // get the directory of .jar
+            ApplicationHome home = new ApplicationHome(getClass());
+            File jarF = home.getSource();
+            // create a fold '/upload/user_avatar/' to save uploaded avatar
+            String dirPath = jarF.getParentFile().toString() + "/upload/user_avatar/";
+            System.out.println("user avatar saved to: " + dirPath);
+
+            File filePath = new File(dirPath);
+            if(!filePath.exists()){
+                filePath.mkdirs();
+            }
+
+            /* do not save images or other files to project directory
             String staticPath = ClassUtils.getDefaultClassLoader().getResource("static/img/upload").getPath();
             String imgPath = "user_avatar" + File.separator + originalFilename;
             String savePath = staticPath + File.separator + imgPath;
@@ -110,10 +124,10 @@ public class UserController {
             File saveFile = new File(savePath);
             if(!saveFile.exists()){
                 saveFile.mkdirs();
-            }
+            }*/
 
-            avatar.transferTo(saveFile);
-            user.setAvatar("/img/upload/user_avatar/"+originalFilename);
+            avatar.transferTo(new File(dirPath + originalFilename));
+            user.setAvatar(originalFilename);
         }
 
         if(userService.save(user)){

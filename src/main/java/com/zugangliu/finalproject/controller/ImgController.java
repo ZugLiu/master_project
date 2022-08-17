@@ -4,6 +4,7 @@ import com.zugangliu.finalproject.bean.User;
 import com.zugangliu.finalproject.mapper.UserMapper;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.boot.system.ApplicationHome;
 import org.springframework.http.MediaType;
 import org.springframework.stereotype.Controller;
 import org.springframework.util.ClassUtils;
@@ -34,7 +35,13 @@ public class ImgController {
         //注意！！！
         //注意！！！
         // filePath中一定不能有空格，不然的话会报“系统找不到指定路径”！！！
-        String filePath = ClassUtils.getDefaultClassLoader().getResource("static/img/upload/comm_header_img").getPath()+File.separator + imgName;
+        //String filePath = ClassUtils.getDefaultClassLoader().getResource("static/img/upload/comm_header_img").getPath()+File.separator + imgName;
+
+        // get directory of .jar
+        ApplicationHome h = new ApplicationHome(getClass());
+        File jarF = h.getSource();
+        String filePath = jarF.getParentFile().toString()+"/upload/comm_header/"+imgName;
+        System.out.println(filePath);
 
         // 使用输入流
         FileInputStream fileInputStream = new FileInputStream(filePath);
@@ -50,7 +57,10 @@ public class ImgController {
     public byte[] getUserAvatar(@PathVariable("userId") String id) throws IOException {
         User user = userMapper.selectById(id);
         String avatar = user.getAvatar();
-        String filePath = ClassUtils.getDefaultClassLoader().getResource("static/").getPath() + File.separator + avatar;
+        //String filePath = ClassUtils.getDefaultClassLoader().getResource("static/").getPath() + File.separator + avatar;
+        ApplicationHome h = new ApplicationHome(getClass());
+        File jarF = h.getSource();
+        String filePath = jarF.getParentFile().toString() + "/upload/user_avatar/" + avatar;
         FileInputStream fileInputStream = new FileInputStream(filePath);
         byte[] bytes = new byte[fileInputStream.available()];
         fileInputStream.read(bytes, 0, fileInputStream.available());

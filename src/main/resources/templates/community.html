@@ -48,7 +48,7 @@
     <div class="container col-xxl-8 px-4 py-5">
         <div class="row flex-lg-row-reverse align-items-center g-5 py-5">
             <div class="col-10 col-sm-8 col-lg-6">
-                <img th:src="${comm.cHeaderImg}" class="d-block mx-lg-auto img-fluid" alt="Community Header Img" width="700" height="500" loading="lazy">
+                <img th:src="|/img/${comm.cHeaderImg}|" class="d-block mx-lg-auto img-fluid" alt="Community Header Img" width="700" height="500" loading="lazy">
             </div>
             <div class="col-lg-6">
                 <h1 class="display-5 fw-bold lh-1 mb-3" th:text="${comm.cName}">Community Name</h1>
@@ -72,7 +72,7 @@
                 <!-- create a topic -->
                 <div class="row" style="padding: 30px">
                     <label for="createPost" class="col-md-1">
-                        <img th:src="${session.user.avatar}"
+                        <img th:src="|/avatar/${session.user.id}|"
                              alt="UserAvatar" width="32"
                              height="32" class="rounded-circle flex-shrink-0"
                         >

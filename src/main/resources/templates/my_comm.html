@@ -78,7 +78,7 @@
                         </svg>-->
                         <div class="commHeader">
                             <a th:href="@{|/community/${comm.id}|}">
-                                <img style="width: 100%; height: 100%; object-fit: cover;" th:src="${comm.cHeaderImg}" th:title="${comm.cName}">
+                                <img style="width: 100%; height: 100%; object-fit: cover;" th:src="|/img/${comm.cHeaderImg}|" th:title="${comm.cName}">
                             </a>
                         </div>
 

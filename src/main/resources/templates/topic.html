@@ -52,7 +52,7 @@
         <div class="post-container" style="width: 70%;">
 
             <div class="post-author">
-                <img class="author-image" th:src="${topicInDetail.author.avatar}" alt="user avatar">
+                <img class="author-image" th:src="|/avatar/${topicInDetail.author.id}|" alt="user avatar">
                 <div class="author-name" th:text="${topicInDetail.author.userName}" id="author">author</div>
             </div>
 
@@ -109,7 +109,7 @@
 
                         <div class="post-group">
                             <div class="post" th:each="option : ${topicInDetail.Options}">
-                                <div class="post__avatar"><img th:src="${option.creator.avatar}"></div>
+                                <div class="post__avatar"><img th:src="|/avatar/${option.creator.id}|"></div>
                                 <h3 class="post__author" th:if="${option.title}" th:text="${option.title}">Lester McTester</h3>
                                 <h3 class="post__author" th:unless="${option.title}">No Title</h3>
                                 <h4 class="post__timestamp">proposed by <span style="color: dodgerblue">[[${option.creator.userName}]]</span> at <span style="color: dodgerblue">[[${option.publishTime}]]</span></h4>
@@ -187,7 +187,7 @@
                 <form id="topic-comment" class="comment-box" th:action="@{/make_comments}" method="post">
                     <label for="my-comment">
                         <div class="comment-avatar" style="width: 20%; position: absolute">
-                            <img th:src="${session.user.avatar}" alt="user-avatar" height="60" width="60">
+                            <img th:src="|/avatar/${session.user.id}|" alt="user-avatar" height="60" width="60">
                         </div>
                     </label>
                     <div style="margin-left:10%; width: 80%;">
@@ -236,7 +236,7 @@
                                 <!--reply form to comment-->
                                 <div class="post__comment" th:id="|reply_form_to_${comment.id}|">
                                     <div class="comment-form">
-                                        <div class="comment-form__avatar"><img th:src="|/avatar/${comment.creator}|"></div>
+                                        <div class="comment-form__avatar"><img th:src="|/avatar/${session.user.id}|"></div>
                                         <form hidden="hidden" th:id="|reply_form_${comment.id}|" th:action="@{/make_comments}" method="post">
                                             <input name="creator" th:value="${session.user.id}">
                                             <input name="creatorName" th:value="${session.user.userName}">

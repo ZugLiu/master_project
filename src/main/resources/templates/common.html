@@ -42,7 +42,7 @@
                 </p>
             </li>
             <li class="nav-item" style="margin-right: 5px;">
-                <img id="userAvatarInHeader" th:src="@{${session.user.avatar}}" width="32" height="32" class="rounded-circle flex-shrink-0">
+                <img id="userAvatarInHeader" th:src="|/avatar/${session.user.id}|" width="32" height="32" class="rounded-circle flex-shrink-0">
             </li>
             <li class="nav-item"><a th:href="@{/index}" class="nav-link active" aria-current="page">Home</a></li>
             <li class="nav-item"><a th:href="@{/createComm}" class="nav-link">Create a Community</a></li>
@@ -80,7 +80,7 @@
     <th:block th:if="not ${#lists.isEmpty(reply.thread)}" >
         <li th:each="r : ${reply.thread}">
             <!-- Avatar -->
-            <div class="comment-avatar"><img th:src="|/avatar/${comment.creator}|" alt="user avatar">
+            <div class="comment-avatar"><img th:src="|/avatar/${r.creator}|" alt="user avatar">
             </div>
             <!-- Container of Comments -->
             <div class="comment-box">
@@ -113,7 +113,7 @@
                     <!--reply to comment-->
                     <div class="post__comment" th:id="|reply_form_to_${r.id}|">
                         <div class="comment-form">
-                            <div class="comment-form__avatar"><img th:src="|/avatar/${comment.creator}|"></div>
+                            <div class="comment-form__avatar"><img th:src="|/avatar/${session.user.id}|"></div>
                             <form hidden="hidden" th:id="|reply_form_${r.id}|" th:action="@{/make_comments}" method="post">
                                 <input name="creator" th:value="${session.user.id}">
                                 <input name="creatorName" th:value="${session.user.userName}">
