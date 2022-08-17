@@ -4,7 +4,7 @@ spring:
   datasource:
     url: jdbc:mysql://localhost:3306/reasonDB
     username: root
-    password: 571428lzG
+    password: *******
 
     druid:
       aop-patterns: com.zugangliu.finalproject.*  #监控SpringBean
