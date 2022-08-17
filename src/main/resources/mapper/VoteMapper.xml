@@ -1,0 +1,31 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper
+        PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+        "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+
+<mapper namespace="com.zugangliu.finalproject.mapper.VoteMapper">
+
+    <insert id="insertVote">
+        insert into t_vote
+            (user_id, option_id, option_belong_to)
+        values (#{userId}, #{optionId}, #{optionBelongTo})
+    </insert>
+    <delete id="deleteVote">
+        delete from t_vote
+        where user_id = #{userId} and option_id = #{optionId}
+    </delete>
+    <select id="getVote" resultType="java.lang.Integer">
+        select * from t_vote
+        where user_id = #{userId} and option_id = #{optionId}
+    </select>
+    <select id="getVoteByOptionBelongTo" resultType="com.zugangliu.finalproject.bean.Vote">
+        select *
+        from t_vote
+        where option_belong_to = #{optionBelongTo}
+    </select>
+    <select id="getVoteByOptionId" resultType="com.zugangliu.finalproject.bean.Vote">
+        select *
+        from t_vote
+        where option_id = #{optionId}
+    </select>
+</mapper>

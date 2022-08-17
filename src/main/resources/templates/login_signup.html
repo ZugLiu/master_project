@@ -1,0 +1,191 @@
+<!doctype html>
+<html lang="en" xmlns:th="http://www.thymeleaf.org">
+  <head>
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <meta name="description" content="">
+    <meta name="author" content="Mark Otto, Jacob Thornton, and Bootstrap contributors">
+    <meta name="generator" content="Hugo 0.88.1">
+    <title>Login</title>
+
+    <link rel="canonical" href="https://getbootstrap.com/docs/5.1/examples/sign-in/">
+
+    <!-- Bootstrap core CSS -->
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.1.3/dist/css/bootstrap.min.css" rel="stylesheet">
+
+    <!-- cropper css -->
+    <link href="/js/cropper_dist/cropper.css" rel="stylesheet"/>
+
+    <style>
+      .bd-placeholder-img {
+        font-size: 1.125rem;
+        text-anchor: middle;
+        -webkit-user-select: none;
+        -moz-user-select: none;
+        user-select: none;
+      }
+
+      @media (min-width: 768px) {
+        .bd-placeholder-img-lg {
+          font-size: 3.5rem;
+        }
+      }
+
+      /*for user avatar cropper*/
+      #floatingAvatarModal{
+        display: none;
+      }
+
+      .previewBox,.previewBoxRound{
+        box-shadow: 0 0 5px #adadad;
+        width: 200px;
+        height: 200px;
+        margin-top: 5px;
+        margin-bottom: 30px;
+        overflow: hidden;       /*这个超出设置为隐藏很重要，否则就会整个显示出来了*/
+      }
+    </style>
+
+    
+    <!-- Custom styles for this template -->
+    <link href="/bootstrap/css/signin.css" rel="stylesheet">
+    <link href="/bootstrap/css/modals.css" rel="stylesheet">
+  </head>
+  <body class="text-center">
+    
+<main class="form-signin">
+  <h1 class="h3 mb-3 fw-normal">Welcome to Reason Forum!</h1>
+  <form th:action="@{/login}" method="post">
+    <img class="mb-4" src="/img/project/theme_icon.png" alt="" width="110" height="110">
+    <h1 class="h3 mb-3 fw-normal">Please sign in</h1>
+
+    <div class="form-floating">
+      <input type="text" class="form-control" id="floatingInput" placeholder="User Name" name="userName">
+      <label for="floatingInput">User Name</label>
+    </div>
+    <div class="form-floating">
+      <input type="password" class="form-control" id="floatingPassword" placeholder="Password" name="password">
+      <label for="floatingPassword">Password</label>
+    </div>
+    <div class="form-floating">
+      <input type="text" class="form-control" id="floatingVerifyCode" placeholder="input verify code here" name="verifyCodeInput">
+      <label for="floatingPassword">Verify Code</label>
+    </div>
+    <div class="form-floating">
+      <img id="kaptcha" th:src="@{/kaptcha}" title="verify code">
+    </div>
+    <div class="form-floating">
+      <span>click the veirify code picture to change it</span><br/>
+      <span th:text="${msg}" style="color: red"></span><br/>
+    </div>
+
+    <div class="checkbox mb-3">
+      <!--<label>
+        <input type="checkbox" value="remember-me"> Remember me
+      </label>-->
+    </div>
+    <button class="w-100 btn btn-lg btn-primary" type="submit">Sign in</button><br/>
+    <p style="margin-top: 10px; margin-bottom: 5px;">Not having an account?</p>
+    <button  type="button" class="w-100 btn btn-lg btn-secondary" data-bs-toggle="modal" data-bs-target="#modalSignin">Sign Up Now!</button>
+    <!--<p class="mt-5 mb-3 text-muted">&copy; 2017–2021</p>-->
+
+  </form>
+  <!--signup modal-->
+  <div id="modalSignin" class="modal fade" tabindex="-1"
+       data-bs-backdrop="static" data-bs-keyboard="false" aria-labelledby="staticBackdropLabel" aria-hidden="true">
+    <div class="modal-dialog" role="document" style="width: 500px">
+      <div class="modal-content rounded-5 shadow">
+        <div class="modal-header p-5 pb-4 border-bottom-0">
+          <!-- <h5 class="modal-title">Modal title</h5> -->
+          <h2 class="fw-bold mb-0">Sign up for free</h2>
+          <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+        </div>
+
+        <div class="modal-body p-5 pt-0">
+          <!-- sign up form starts -->
+          <form id="sign_up_form">
+            <div class="form-floating mb-3">
+              <input type="email" name="email" class="form-control rounded-4" id="floatingInputModal" placeholder="name@example.com" >
+              <label for="floatingInputModal">Email address</label>
+            </div>
+            <div class="form-floating mb-3">
+              <input type="text" name="userName" class="form-control rounded-4" id="floatingUsernameModal" placeholder="User Name"
+                     title="(6-10 letter or digit, including _ and -, the first must be a letter)">
+              <label for="floatingPasswordModal">User Name</label>
+            </div>
+            <div class="form-floating mb-3">
+              <input type="password" name="password" class="form-control rounded-4" id="floatingPasswordModal" placeholder="Password"
+                     title="(6-12 letter or digit, including _, -, @, #, &, *)">
+              <label for="floatingPasswordModal">Password </label>
+            </div>
+            <div class="form-floating mb-3">
+              <input type="password" class="form-control rounded-4" id="floatingPasswordAgainModal" placeholder="Password">
+              <label for="floatingPasswordModal">Enter Password Again</label>
+            </div>
+            <div class="mb-3">
+              <input
+                      type="file"
+                      name="headerImg"
+                      class="form-control rounded-4"
+                      id="floatingAvatarModal"
+                      placeholder="headerImg"
+                      accept="image/*"
+              >
+              <label for="floatingAvatarModal" class="form-label">Upload Your Avatar</label>
+              <!--crop user avatar-->
+              <div class="box">
+                <img id="cropImg" hidden>
+              </div>
+              <div class="previewText" hidden><span class="text-muted">crop preview</span></div>
+              <div class="previewBox" id="previewBox" hidden></div>
+
+              <div class="btn-group" role="group" aria-label="Basic outlined example">
+                <button type="button" id="cropImgBtn" class="btn btn-outline-primary">
+                  upload image and crop
+                </button>
+                <button type="button" id="changeCropImgBtn" class="btn btn-outline-primary" hidden>
+                  change image and crop
+                </button>
+                <button type="button" id="confirm_cropper" class="btn btn-primary"> confirm </button>
+              </div>
+
+            </div>
+            <span  id="emailError" style="color: red">Email address format is wrong!</span><br/>
+            <span  id="userNameError" style="color: red">User name format is wrong!<br>(6-10 letter or digit, including _ and -, the first must be a letter)</span><br/>
+            <span  id="pswFormatError" style="color: red">Password format is wrong!<br>(6-12 letter or digit, including _, -, @, #, &, *)</span><br/>
+            <span  id="pswTwiceError" style="color: red">The two entered passwords do not match!</span><br/>
+
+            <button id="SignUpSubmitBtn" class="w-100 mb-2 btn btn-lg rounded-4 btn-primary" type="button">Sign up</button>
+            <!--<small class="text-muted">By clicking Sign up, you agree to the terms of use.</small>
+            <hr class="my-4">
+            <h2 class="fs-5 fw-bold mb-3">Or use a third-party</h2>
+            <button class="w-100 py-2 mb-2 btn btn-outline-dark rounded-4" type="submit">
+              <svg class="bi me-1" width="16" height="16"><use xlink:href="#twitter"/></svg>
+              Sign up with Twitter
+            </button>
+            <button class="w-100 py-2 mb-2 btn btn-outline-primary rounded-4" type="submit">
+              <svg class="bi me-1" width="16" height="16"><use xlink:href="#facebook"/></svg>
+              Sign up with Facebook
+            </button>
+            <button class="w-100 py-2 mb-2 btn btn-outline-secondary rounded-4" type="submit">
+              <svg class="bi me-1" width="16" height="16"><use xlink:href="#github"/></svg>
+              Sign up with GitHub
+            </button>-->
+          </form>
+        </div>
+      </div>
+    </div>
+  </div>
+</main>
+
+
+
+
+<script src="https://cdn.jsdelivr.net/npm/bootstrap@5.1.3/dist/js/bootstrap.bundle.min.js"></script>
+<script src="/js/axios.min.js"></script>
+<script src="/bootstrap/js/jquery-3.6.0.min.js"></script>
+<script src="/js/cropper_dist/cropper.js" type="module"></script>
+<script src="/js/login_signup.js"></script>
+
+  </body>
+</html>

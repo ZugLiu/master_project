@@ -1,0 +1,88 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper
+        PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+        "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+
+<mapper namespace="com.zugangliu.finalproject.mapper.TopicMapper">
+    <resultMap id="topicUserMap" type="com.zugangliu.finalproject.bean.Topic">
+        <id column="t_id" property="id"></id>
+        <result column="title" property="title"></result>
+        <result column="content" property="content"></result>
+        <result column="publish_time" property="publishTime"></result>
+        <result column="vote_start_time" property="voteStartTime"></result>
+        <result column="vote_end_time" property="voteEndTime"></result>
+        <association property="author" javaType="com.zugangliu.finalproject.bean.User">
+            <id column="userId" property="id"></id>
+            <result column="user_name" property="userName"></result>
+            <result column="email" property="email"></result>
+            <result column="avatar" property="avatar"></result>
+        </association>
+
+        <!-- 这个association会导致应用此resultMap的语句发起两次查询。
+             在此语境下，第一次查询是会返回一个表，并根据这个表里的数据组装Topic对象（但不是所有属性都会被赋值）
+             第二次查询就是此association标签的select属性对应的sql，会返回第二个表。
+             此association中的标签
+                column: 此列的值传给第二次查询作为查询参数 （一般来说，是第一个表中的某一列）
+                property: Topic对象的属性。第二次查询的结果会赋给这个属性。
+         -->
+        <association column="t_id" property="numOfComments" select="com.zugangliu.finalproject.mapper.TopicMapper.getCommentNumOfTopic"/>
+
+        <association property="community" javaType="com.zugangliu.finalproject.bean.Community">
+            <id column="id" property="id"></id>
+            <result column="c_name" property="cName"></result>
+        </association>
+        
+
+    </resultMap>
+
+    <!-- insert a new topic into t_topic-->
+    <insert id="insert" useGeneratedKeys="true" keyProperty="id">
+        insert into t_topic (title, content, author, belong_to, vote_start_time, vote_end_time)
+        values (#{title}, #{content}, #{author.id},
+                                    #{community.id}, #{voteStartTime}, #{voteEndTime})
+    </insert>
+
+    <!--    public List<Topic> getAllTopics(); -->
+    <select id="getAllTopics" resultMap="topicUserMap">
+        select t.id t_id, t.title, t.author, t.publish_time, t.vote_start_time, t.vote_end_time, substring(t.content, 1, 300) content, u.id userId, u.user_name, u.email, u.avatar, c.*
+        from t_topic t
+                 left join t_user u
+                           on t.author = u.id
+                inner join t_community c
+                            on t.belong_to = c.id
+        order by t.publish_time desc
+    </select>
+
+    <!--     public int getCommentNumOfTopic(@Param("topicId") int topicId); -->
+    <select id="getCommentNumOfTopic" resultType="java.lang.Integer">
+        select count(*) numOfComments
+        from t_comment
+        where toTopicId = #{topicId}
+    </select>
+    <select id="getTopicsByCommId" resultMap="topicUserMap">
+        select t.id t_id, t.title, t.author, t.publish_time, t.vote_start_time, t.vote_end_time, substring(t.content, 1, 300) content,
+               u.id userId, u.user_name, u.email, u.avatar,
+               c.*
+        from t_topic t
+                 left join t_user u
+                           on t.author = u.id
+                 inner join t_community c
+                            on t.belong_to = c.id
+        where t.belong_to = #{commId}
+        order by t_id desc
+    </select>
+
+    <!--    public Topic getTopicById(int id);-->
+    <select id="getTopicById" resultMap="topicUserMap">
+        select t.id t_id, t.title, t.author, t.publish_time, t.vote_start_time, t.vote_end_time, t.content content,
+               u.id userId, u.user_name, u.email, u.avatar,
+               c.*
+        from t_topic t
+            inner join t_user u
+                on t.author = u.id
+            inner join t_community c
+                on t.belong_to = c.id
+        where t.id = #{id}
+    </select>
+
+</mapper>

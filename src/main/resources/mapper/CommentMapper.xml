@@ -1,0 +1,26 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper
+        PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+        "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+
+<mapper namespace="com.zugangliu.finalproject.mapper.CommentMapper">
+
+    <insert id="insertComment" useGeneratedKeys="true" keyProperty="id">
+        insert into t_comment
+        (content, creator, creator_name, toTopic, toTopicId, toCommentId, toCommentCreatorName)
+        values (#{comment.content}, #{comment.creator}, #{comment.creatorName}, #{comment.toTopic}, #{comment.toTopicId}, #{comment.toCommentId}, #{comment.toCommentCreatorName})
+    </insert>
+    <insert id="insertReply">
+
+    </insert>
+    <select id="getCommentsByTopicId" resultType="com.zugangliu.finalproject.bean.Comment">
+        select *
+        from t_comment
+        where toTopic = 1 and toTopicId = #{topicId}
+    </select>
+    <select id="getReplyToComment" resultType="com.zugangliu.finalproject.bean.Comment">
+        select *
+        from t_comment
+        where toTopic = 0 and toCommentId = #{commentId}
+    </select>
+</mapper>

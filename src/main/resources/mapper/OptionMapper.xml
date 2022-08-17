@@ -1,0 +1,42 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper
+        PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+        "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+
+<mapper namespace="com.zugangliu.finalproject.mapper.OptionMapper">
+    <resultMap id="option_user" type="com.zugangliu.finalproject.bean.Option">
+        <id property="id" column="id"></id>
+        <result property="title" column="title"></result>
+        <result property="content" column="content"></result>
+        <result property="votes" column="votes"></result>
+        <result property="publishTime" column="publish_time"></result>
+        <result property="belongTo" column="belong_to"></result>
+        <association property="creator" javaType="com.zugangliu.finalproject.bean.User">
+            <id property="id" column="uid"></id>
+            <result property="userName" column="user_name"></result>
+            <result property="avatar" column="avatar"></result>
+        </association>
+
+    </resultMap>
+
+    <insert id="insert">
+        insert into t_option (
+                              title, content, votes, creator, belong_to
+        ) values (
+                                     #{title}, #{content}, #{votes},
+                                     #{creator.id}, #{belongTo}
+                                    )
+    </insert>
+    <update id="updateVoteCount">
+        update t_option
+        set votes = votes + #{change}
+        where id = #{optionId}
+    </update>
+    <select id="getOptionsByTopicId" resultMap="option_user">
+        select u.id uid, u.user_name, u.avatar,
+                o.*
+        from t_option o
+            inner join t_user u on o.creator = u.id
+        where belong_to = #{topicId}
+    </select>
+</mapper>

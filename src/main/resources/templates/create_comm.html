@@ -1,0 +1,150 @@
+<!DOCTYPE html>
+<html lang="en" xmlns:th="http://www.thymeleaf.org">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <meta name="description" content="">
+    <title>create your community</title>
+
+    <link rel="canonical" href="https://getbootstrap.com/docs/5.1/examples/checkout/">
+
+    <!--cropper css-->
+    <link href="/js/cropper_dist/cropper.css" rel="stylesheet"/>
+    <style>
+        #imgReader{
+            display: none;
+        }
+
+        .previewBox,.previewBoxRound{
+            box-shadow: 0 0 5px #adadad;
+            width: 200px;
+            height: 107px;
+            margin-top: 5px;
+            margin-bottom: 30px;
+            overflow: hidden;       /*这个超出设置为隐藏很重要，否则就会整个显示出来了*/
+        }
+        .previewBoxRound{
+            border-radius: 50%;     /*设置为圆形*/
+        }
+    </style>
+
+    <!--bootstrap example checkout css and bootstrap core css-->
+    <link href="/bootstrap/css/bootstrap.min.css" rel="stylesheet">
+
+    <style>
+        .bd-placeholder-img {
+            font-size: 1.125rem;
+            text-anchor: middle;
+            -webkit-user-select: none;
+            -moz-user-select: none;
+            user-select: none;
+        }
+
+        @media (min-width: 768px) {
+            .bd-placeholder-img-lg {
+                font-size: 3.5rem;
+            }
+        }
+    </style>
+
+    <!-- Custom styles for this template -->
+    <link href="/bootstrap/css/form-validation.css" rel="stylesheet">
+</head>
+<body class="bg-light">
+
+<div class="container">
+    <main>
+        <div class="py-5 text-center">
+            <h1 th:text="${msg}"></h1>
+            <img class="d-block mx-auto mb-4" src="/img/project/theme_icon.png" alt="" width="72" height="72">
+            <h2>Create Your Community</h2>
+            <p class="lead">You can create your community here by completing the following information.</p>
+        </div>
+
+        <div class="row">
+            <div class="col-md-12 col-lg-8" style="width: 100%">
+                <h4 class="mb-3">Community Information</h4>
+                <form class="needs-validation" novalidate
+                      id="create_comm_form"
+                >
+                    <input type="hidden" name="cCreator" th:value="${session.user.userName}">
+                    <div class="row g-3">
+                        <div class="col-12">
+                            <label for="commName" class="form-label">Community Name</label>
+                            <input type="text" class="form-control" id="commName" name="cName" placeholder="Name your community" required>
+                            <div class="invalid-feedback">
+                                Please enter your community's name
+                            </div>
+                        </div>
+
+                        <div class="col-12">
+                            <label for="about" class="form-label">About your community <span class="text-muted">(Optional)</span></label>
+                            <textarea class="form-control" id="about" name="cAbout" rows="8" form="create_comm_form"></textarea>
+                        </div>
+
+                        <div class="col-12">
+                            <label for="rules" class="form-label">Community Rules</label>
+                            <textarea class="form-control" id="rules" name="cRules" rows="8" form="create_comm_form" placeholder="Don't forget to set the rules!" required></textarea>
+                            <div class="invalid-feedback">
+                                You must set rules for your community.
+                            </div>
+                        </div>
+
+                        <div class="col-12">
+                            <label class="form-label" for="imgReader">Upload your community header image</label>
+                            <input
+                                    class="form-control"
+                                    type="file"
+                                    accept="image/*"
+                                    id="imgReader"
+                                    required
+                            >
+                            <div class="invalid-feedback">
+                                You must upload a header image
+                            </div>
+                            <div class="box">
+                                <img id="cropImg" hidden>
+                            </div>
+                            <div class="previewText" hidden><span class="text-muted">crop preview</span></div>
+                            <div class="previewBox" id="previewBox" hidden></div>
+
+                            <button type="button" id="cropImgBtn" class="btn btn-outline-primary"> upload image and crop </button>
+                            <button type="button" id="changeCropImgBtn" class="btn btn-outline-primary" hidden> change image and crop </button>
+                            <button type="button" id="confirm_cropper" class="btn btn-primary"> confirm </button>
+
+                        </div>
+
+                    </div>
+
+                    <hr class="my-4">
+
+                    <button class="w-100 btn btn-primary btn-lg" type="button" id="submitBtn">Create</button>
+                </form>
+            </div>
+        </div>
+    </main>
+
+    <footer class="my-5 pt-5 text-muted text-center text-small">
+        <p class="mb-1">Reason Forum</p>
+        <ul class="list-inline">
+            <li class="list-inline-item"><a th:href="@{/index}">Home</a></li>
+            <li class="list-inline-item"><a th:href="@{/about}">About</a></li>
+        </ul>
+    </footer>
+</div>
+
+
+<!--bootstrap-->
+<script src="/bootstrap/js/bootstrap.bundle.min.js"></script>
+<!--example-->
+<script src="/bootstrap/js/form-validation.js"></script>
+<!-- jQuery -->
+<script src="/bootstrap/js/jquery-3.6.0.min.js"></script>
+<!-- axios -->
+<script src="/js/axios.min.js"></script>
+<!-- cropper.js -->
+<script src="/js/cropper_dist/cropper.js" type="module"></script>
+<!-- this page's js -->
+<script src="/js/create_comm.js" type="module"></script>
+</body>
+</html>

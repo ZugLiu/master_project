@@ -1,0 +1,500 @@
+<!DOCTYPE html>
+<html lang="en" xmlns:th="http://www.thymeleaf.org">
+<head>
+    <meta charset="UTF-8">
+    <title>Community</title>
+  <!-- Bootstrap core CSS -->
+  <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.1.3/dist/css/bootstrap.min.css" rel="stylesheet">
+
+  <style>
+    .bd-placeholder-img {
+      font-size: 1.125rem;
+      text-anchor: middle;
+      -webkit-user-select: none;
+      -moz-user-select: none;
+      user-select: none;
+    }
+
+    @media (min-width: 768px) {
+      .bd-placeholder-img-lg {
+        font-size: 3.5rem;
+      }
+    }
+
+    .option-text-area{
+        margin-bottom: 10px;
+    }
+    .btn-option-del{
+        position: absolute;
+        right: 5px;
+    }
+  </style>
+
+  <!-- Custom styles for list groups -->
+    <link href="/bootstrap/css/heroes.css" rel="stylesheet">
+    <link href="/bootstrap/css/features.css" rel="stylesheet">
+    <link href="/bootstrap/css/list-groups.css" rel="stylesheet">
+    <link href="/bootstrap/css/modals.css" rel="stylesheet">
+    <link rel="stylesheet" href="/bootstrap/css/options.css">
+    <link rel="stylesheet" href="//maxcdn.bootstrapcdn.com/font-awesome/4.3.0/css/font-awesome.min.css">
+
+
+</head>
+<body>
+<div th:replace="common::#header"></div>
+
+<div id="container">
+    <!--Community Main Banner-->
+    <div class="container col-xxl-8 px-4 py-5">
+        <div class="row flex-lg-row-reverse align-items-center g-5 py-5">
+            <div class="col-10 col-sm-8 col-lg-6">
+                <img th:src="${comm.cHeaderImg}" class="d-block mx-lg-auto img-fluid" alt="Community Header Img" width="700" height="500" loading="lazy">
+            </div>
+            <div class="col-lg-6">
+                <h1 class="display-5 fw-bold lh-1 mb-3" th:text="${comm.cName}">Community Name</h1>
+                <p id="commId" th:text="${comm.id}" hidden></p> <!--for frontend sending request to backend-->
+                <p class="lead" th:text="${comm.cAbout}">This is Community Introduction.This is Community Introduction.This is Community Introduction.This is Community Introduction.This is Community Introduction.</p>
+                <div class="d-grid gap-2 d-md-flex justify-content-md-start">
+                    <button type="button" class="btn btn-primary btn-lg px-4 me-md-2" @click="joinComm">Join</button>
+                    <button type="button" class="btn btn-outline-secondary btn-lg px-4" @click="leaveComm">Leave</button>
+                </div>
+            </div>
+        </div>
+    </div>
+    <hr>
+
+
+    <div class="container py-4" >
+        <div class="row">
+            <!--All topics-->
+            <div class="col-md-8">
+
+                <!-- create a topic -->
+                <div class="row" style="padding: 30px">
+                    <label for="createPost" class="col-md-1">
+                        <img th:src="${session.user.avatar}"
+                             alt="UserAvatar" width="32"
+                             height="32" class="rounded-circle flex-shrink-0"
+                        >
+                    </label>
+                    <div class="col-md-10">
+                        <input id="createPost"
+                               class="form-control"
+                               type="text"
+                               placeholder="create a post"
+                               data-bs-toggle="modal"
+                               data-bs-target="#modalCreateTopic"
+                               @click="resetOptionCounter"
+                        >
+                    </div>
+                </div>
+
+
+                <!-- list of topics -->
+                <h2>Hot Topics</h2>
+                <div class="col-md-8" v-for="topic in topics">
+                    <!-- topic excerpt -->
+                    <div class="p-5 bg-light border rounded-3" style="padding-top: 1rem!important; padding-bottom: 1rem!important; margin-bottom: 10px;  width: 145%">
+                        <header>
+                            <div class="row">
+                                <div class="col-md-4">From Community:  <span style="color: #0d6efd;">{{topic.community.cname}}</span></div>
+                                <div class="col-md-8 text-end">posted by <span style="color: #0d6efd;">{{topic.author.userName}}</span>      published {{topic.publishTime}} ago</div>
+                            </div>
+                        </header>
+                        <hr style="margin: 3px 0px 3px 0px">
+                        <h2><a :href="'/topicDetails/'+topic.id" style="text-decoration: none">{{topic.title}}</a></h2>
+                        <p style="white-space: pre-line">{{topic.content}}</p>
+                        <a :href="'/topicDetails/' + topic.id"><button class="btn btn-outline-secondary" type="button">Read Full Text</button></a>
+                        <button class="btn btn-outline-primary"
+                                type="button"
+                                data-bs-toggle="collapse"
+                                :data-bs-target="'#optionList'+topic.id"
+                                aria-expanded="false"
+                                aria-controls="collapseExample"
+                                @click="getOptionsByTopic(topic.id)"
+                        >
+                            See options
+                        </button>
+                        <div class="collapse" :id="'optionList'+topic.id">
+                            <div class="card card-body">
+                                <div class="post-group">
+                                    <div class="post" v-for="option in topic.options">
+                                        <div class="post__avatar"><img :src="option.creator.avatar"></div>
+                                        <h3 class="post__author" v-if="option.title" >{{option.title}}</h3>
+                                        <h3 class="post__author" v-else="option.title">No Title</h3>
+                                        <h4 class="post__timestamp">proposed by <span style="color: dodgerblue">{{option.creator.userName}}</span> at <span style="color: dodgerblue">{{option.publishTime}}</span></h4>
+                                        <p class="post__body">{{option.content}}</p>
+                                        <div class="post__actions">
+                                            <form :id="'vote_form'+option.id" th:action="@{/option}" method="post">
+                                                <input type="hidden" name="_method" value="PUT">
+                                                <input type="hidden" name="voterId" th:value="${session.user.id}">
+                                                <input type="hidden" name="voteCountChange" value="0">
+                                                <input type="hidden" name="optionId" :value="option.id">
+                                                <input type="hidden" name="optionBelongTo" :value="topic.id">
+                                            </form>
+                                            <div class="button button--approve" :id="'vote'+option.id" @click="vote($event)">
+                                                <i class="fa fa-thumbs-o-up">VOTE</i>
+                                                <i class="fa fa-thumbs-up solid">VOTED</i>
+                                            </div>
+                                            <div class="button button--deny" :id="'cancel'+option.id" @click="cancelVote($event)">
+                                                <i class="fa fa-ban">CANCEL</i>
+                                                <i class="fa fa-ban solid">CANCELED</i>
+                                            </div>
+                                            <span :id="'updateMsg'+option.id" style="color: red" th:text="${msg}"></span>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                        <hr style="margin: 7px 0px 3px 0px">
+                        <footer>
+                            <div class="row">
+                                <div class="col-md-4">{{topic.numOfComments}} comments</div>
+                                <div class="col-md-8 text-end"><span :id="'prompt'+topic.id" style="color: red"></span><span style="color: red" :id="topic.id"></span></div>
+                            </div>
+                        </footer>
+                    </div>
+                </div>
+
+                <!-- pagination -->
+                <div class="row">
+                    <div class="col-md-4">
+                        共{{pageInfo.total}}条数据，{{pageInfo.pages}}页
+                    </div>
+                    <div class="col-md-4">
+                        <nav aria-label="Page navigation example">
+                            <ul class="pagination">
+                                <li class="page-item">
+                                    <a class="page-link" href="#" @click="getTopicsByCommPN(commId, 1)">
+                                        First Page
+                                    </a>
+                                </li>
+                                <div v-if="!pageInfo.isFirstPage">
+                                    <li class="page-item">
+                                        <a class="page-link" href="#" @click="getTopicsByCommPN(commId, pageInfo.pageNum-1)">
+                                            Previous
+                                        </a>
+                                    </li>
+                                </div>
+
+                                <li class="page-item" v-if="!pageInfo.isFirstPage">
+                                    <a class="page-link" href="#" @click="getTopicsByCommPN(commId, pageInfo.pageNum-1)">
+                                        {{pageInfo.prePage}}
+                                    </a>
+                                </li>
+                                <li class="page-item active">
+                                    <a class="page-link" href="#" @click="getTopicsByCommPN(commId, pageInfo.pageNum)">
+                                        {{pageInfo.pageNum}}
+                                    </a>
+                                </li>
+                                <li class="page-item" v-if="!pageInfo.isLastPage">
+                                    <a class="page-link" href="#" @click="getTopicsByCommPN(commId, pageInfo.pageNum+1)">
+                                        {{pageInfo.nextPage}}
+                                    </a>
+                                </li>
+
+                                <div v-if="!pageInfo.isLastPage">
+                                    <li class="page-item">
+                                        <a class="page-link" href="#" @click="getTopicsByCommPN(commId, pageInfo.pageNum+1)" >
+                                            Next
+                                        </a>
+                                    </li>
+                                </div>
+
+                                <li class="page-item">
+                                    <a class="page-link" href="#" @click="getTopicsByCommPN(commId, pageInfo.pages)" >
+                                        Last Page
+                                    </a>
+                                </li>
+                            </ul>
+                        </nav>
+                    </div>
+                </div>
+            </div>
+
+            <!--  Community Introduction, Rules and other things -->
+            <div class="col-md-4">
+                <div class="row d-flex align-items-start">
+                    <div>
+                        <h2>About</h2>
+                        <p th:text="${comm.cAbout}">Introduce your community here.
+                            Introduce your community here.
+                            Introduce your community here.
+                            Introduce your community here.
+                        </p>
+                    </div>
+                </div>
+                <div class="row d-flex align-items-center">
+                    <div>
+                        <h2>Community Rules</h2>
+                        <p th:text="${comm.cRules}">What can do; What cannot do.
+                            What can do; What cannot do.
+                            What can do; What cannot do.
+                            What can do; What cannot do.
+                        </p>
+                    </div>
+                </div>
+                <div class="row d-flex align-items-end">
+                    <div>
+                        <h2>Key Members</h2>
+                        <p>Founder: [[${comm.cCreator}]]</p>
+                    </div>
+                </div>
+            </div>
+
+        </div>
+
+        <!-- create topic modal -->
+        <div class="modal fade " tabindex="-1"
+             role="dialog" id="modalCreateTopic" data-bs-backdrop="static" data-bs-keyboard="false">
+            <div class="modal-dialog modal-dialog-scrollable" role="document" style="max-width: 80%; ">
+                <div class="modal-content rounded-5 shadow">
+                    <div class="modal-header p-5 pb-4 border-bottom-0">
+                        <!-- <h5 class="modal-title">Modal title</h5> -->
+                        <h2 class="fw-bold mb-0">Create Your Topic!</h2>
+                        <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+                    </div>
+
+                    <div class="modal-body p-5 pt-0">
+                        <form class="" id="createTopicForm" method="post" th:action="@{/topics}">
+                            <!-- commId, 用于传给后端，后端确定是哪个comm-->
+                            <input type="hidden" name="commId" :value="commId">
+                            <!--title-->
+                            <div class="form-floating mb-3">
+                                <input type="text" class="form-control rounded-4" id="Title" name="title" placeholder="Title">
+                                <label for="Title">Title</label>
+                            </div>
+                            <!--content-->
+                            <div class="form-floating mb-3">
+                                <textarea form="createTopicForm" class="form-control" id="Content" name="content" style="height: 80%;" placeholder="Content" rows="6"></textarea>
+                                <label for="Content">Content</label>
+                            </div>
+                            <!--vote starts in-->
+                            <!--<div class="form-floating mb-3" style="width: 80%">
+                                <h5>Vote starts in</h5>
+                                <div class="form-check">
+                                    <input class="form-check-input voteStartsIn" type="radio" name="voteStartsIn" id="flexRadioDefault1"
+                                           value="5 hours"
+                                           @click="uncheckCus"
+                                    >
+                                    <label class="form-check-label" for="flexRadioDefault1">
+                                        5 hours
+                                    </label>
+                                </div>
+                                <div class="form-check">
+                                    <input class="form-check-input voteStartsIn" type="radio" name="voteStartsIn" id="flexRadioDefault2"
+                                           value="10 hours"
+                                           @click="uncheckCus"
+                                    >
+                                    <label class="form-check-label" for="flexRadioDefault2">
+                                        10 hours
+                                    </label>
+                                </div>
+                                <div class="form-check">
+                                    <input class="form-check-input voteStartsIn" type="radio" name="voteStartsIn" id="flexRadioDefault3"
+                                           value="1 days"
+                                           @click="uncheckCus"
+                                    >
+                                    <label class="form-check-label" for="flexRadioDefault2">
+                                        1 day
+                                    </label>
+                                </div>
+                                <div class="form-check">
+                                    <input class="form-check-input voteStartsIn" type="radio" name="voteStartsIn" id="flexRadioDefault4"
+                                           value="5 days"
+                                           @click="uncheckCus"
+                                    >
+                                    <label class="form-check-label" for="flexRadioDefault2">
+                                        5 days
+                                    </label>
+                                </div>
+                                <div class="form-check">
+                                    <input class="form-check-input" type="radio"
+                                           name="voteStartsIn" id="customisePrep"
+                                           v-on:click="check"
+                                    >
+                                    <label class="form-check-label" for="customisePrep">
+                                        or customise time length
+                                    </label>
+                                </div>
+
+                                <div class="input-group">
+                                    <input type="text" name = "startInDays" id="startInDays"
+                                           class="form-control prepTime customisedDays"
+                                           style="margin-left: 10px"
+                                           readonly
+                                           v-on:blur="validateCustomisedTime"
+                                    >
+                                    <span class="input-group-text">days</span>
+                                    <input type="text" name = "startInHours" id="startInHours"
+                                           class="form-control prepTime customisedHours"
+                                           readonly
+                                           v-on:blur="validateCustomisedTime"
+                                    >
+                                    <span class="input-group-text">hours</span>
+                                    <input type="text" name = "startInMinutes" id="startInMinutes"
+                                           class="form-control prepTime customisedMinutes"
+                                           readonly
+                                           v-on:blur="validateCustomisedTime"
+                                    >
+                                    <span class="input-group-text">minutes</span>
+                                    <input type="text" name = "startInSeconds" id="startInSeconds"
+                                           class="form-control prepTime customisedSeconds"
+                                           readonly
+                                           v-on:blur="validateCustomisedTime"
+                                    >
+                                    <span class="input-group-text">seconds</span>
+                                </div>
+                                <div class="form-check">
+                                    <span style="color: red" id="customisedPrepMsg"></span>
+                                </div>
+                            </div>-->
+                            <!-- set vote start date-->
+                            <div class="mb-3" style="width: 30%">
+                                <label class="form-label" for="layDateE">
+                                    Choose when vote starts
+                                </label>
+                                <div class="input-group mb-3">
+                                    <span class="input-group-text">
+                                        <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" fill="currentColor" class="bi bi-calendar-event" viewBox="0 0 16 16">
+  <path d="M11 6.5a.5.5 0 0 1 .5-.5h1a.5.5 0 0 1 .5.5v1a.5.5 0 0 1-.5.5h-1a.5.5 0 0 1-.5-.5v-1z"/>
+  <path d="M3.5 0a.5.5 0 0 1 .5.5V1h8V.5a.5.5 0 0 1 1 0V1h1a2 2 0 0 1 2 2v11a2 2 0 0 1-2 2H2a2 2 0 0 1-2-2V3a2 2 0 0 1 2-2h1V.5a.5.5 0 0 1 .5-.5zM1 4v10a1 1 0 0 0 1 1h12a1 1 0 0 0 1-1V4H1z"/>
+</svg>
+                                    </span>
+                                    <input name="startDate" class="form-control" id="layDateS" type="text">
+                                </div>
+                            </div>
+                            <!--vote duration-->
+                            <!--<div class="form-floating mb-3" style="width: 80%">
+                                <h5>Voting Duration</h5>
+                                <div class="form-check">
+                                    <input class="form-check-input votingDuration"
+                                           type="radio" name="votingDuration"
+                                           id="flexRadioDuration1" value="5 hours"
+                                           v-on:click="uncheckCus"
+                                    >
+                                    <label class="form-check-label" for="flexRadioDuration1">
+                                        5 hours
+                                    </label>
+                                </div>
+                                <div class="form-check">
+                                    <input class="form-check-input votingDuration" type="radio"
+                                           name="votingDuration" id="flexRadioDuration2"
+                                           value="10 hours"
+                                           v-on:click="uncheckCus"
+                                    >
+                                    <label class="form-check-label" for="flexRadioDuration2">
+                                        10 hours
+                                    </label>
+                                </div>
+                                <div class="form-check">
+                                    <input class="form-check-input votingDuration" type="radio" name="votingDuration" id="flexRadioDuration3" value="1 days"
+                                           v-on:click="uncheckCus"
+                                    >
+                                    <label class="form-check-label" for="flexRadioDuration3">
+                                        1 day
+                                    </label>
+                                </div>
+                                <div class="form-check">
+                                    <input class="form-check-input votingDuration" type="radio"
+                                           name="votingDuration" id="flexRadioDuration4" value="5 days"
+                                           v-on:click="uncheckCus"
+                                    >
+                                    <label class="form-check-label" for="flexRadioDuration4">
+                                        5 days
+                                    </label>
+                                </div>
+                                <div class="form-check">
+                                    <input class="form-check-input" type="radio"
+                                           name="votingDuration" id="customiseDuration"
+                                           v-on:click="check"
+                                    >
+                                    <label class="form-check-label" for="customiseDuration">
+                                        or customise time length
+                                    </label>
+                                </div>
+
+                                <div class="input-group">
+                                    <input type="text" name = "durationDays"
+                                           @blur="validateCustomisedTime"
+                                           id="durationDays"
+                                           class="form-control durationTime customisedDays" style="margin-left: 10px" readonly>
+                                    <span class="input-group-text">days</span>
+                                    <input type="text" name = "durationHours"
+                                           @blur="validateCustomisedTime"
+                                           id="durationHours"
+                                           class="form-control durationTime customisedHours" readonly>
+                                    <span class="input-group-text">hours</span>
+                                    <input type="text" name = "durationMinutes"
+                                           @blur="validateCustomisedTime"
+                                           id="durationMinutes"
+                                           class="form-control durationTime customisedMinutes" readonly>
+                                    <span class="input-group-text">minutes</span>
+                                    <input type="text" name = "durationSeconds"
+                                           @blur="validateCustomisedTime"
+                                           id="durationSeconds"
+                                           class="form-control durationTime customisedSeconds" readonly>
+                                    <span class="input-group-text">seconds</span>
+                                </div>
+                                <div class="form-check">
+                                    <span style="color: red" id="customisedDurationMsg"></span>
+                                </div>
+                            </div>-->
+                            <!--set vote end date-->
+                            <div class="mb-3" style="width: 30%">
+                                <label class="form-label" for="layDateE">
+                                    Choose when vote ends
+                                </label>
+                                <div class="input-group mb-3">
+                                    <span class="input-group-text">
+                                        <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" fill="currentColor" class="bi bi-calendar-event" viewBox="0 0 16 16">
+  <path d="M11 6.5a.5.5 0 0 1 .5-.5h1a.5.5 0 0 1 .5.5v1a.5.5 0 0 1-.5.5h-1a.5.5 0 0 1-.5-.5v-1z"/>
+  <path d="M3.5 0a.5.5 0 0 1 .5.5V1h8V.5a.5.5 0 0 1 1 0V1h1a2 2 0 0 1 2 2v11a2 2 0 0 1-2 2H2a2 2 0 0 1-2-2V3a2 2 0 0 1 2-2h1V.5a.5.5 0 0 1 .5-.5zM1 4v10a1 1 0 0 0 1 1h12a1 1 0 0 0 1-1V4H1z"/>
+</svg>
+                                    </span>
+                                    <input name="endDate" class="form-control" id="layDateE" type="text">
+                                </div>
+                            </div>
+                            <!--add option-->
+                            <div class="form-floating mb-3" style="width: 80%">
+                                <button type="button" class="btn btn-primary" @click="createOption">Create Your Options!</button>
+                                <div id="optionGroup">
+
+                                </div>
+                            </div>
+                            <!--submit-->
+                            <button type="submit" class="btn btn-primary" @click="validateBeforeSubmit">Publish</button>
+                            <span style="color:red" id="validationMsg"></span>
+                        </form>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+<script src="/bootstrap/js/jquery-3.6.0.min.js"></script>
+<script src="/laydate/laydate.js"></script>
+<script>
+    let now = new Date().getTime();
+    laydate.render({
+        elem:'#layDateS',
+        min: now,
+        lang:'en',
+        format:'yyyy-MM-dd HH:mm:ss',
+        type:'datetime',
+    });
+    laydate.render({
+        elem:'#layDateE',
+        lang:'en',
+        min: now,
+        format:'yyyy-MM-dd HH:mm:ss',
+        type:'datetime'
+    });
+</script>
+<script src="https://cdn.jsdelivr.net/npm/bootstrap@5.1.3/dist/js/bootstrap.bundle.min.js"></script>
+<script src="/js/vue.js"></script>
+<script src="/js/axios.min.js"></script>
+<script src="/js/community.js"></script>
+</body>
+</html>

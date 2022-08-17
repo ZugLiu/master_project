@@ -1,0 +1,52 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper
+        PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+        "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+
+<mapper namespace="com.zugangliu.finalproject.mapper.CommunityMapper">
+    <insert id="joinComm">
+        insert into t_user_community
+        values (
+                #{user.id}, #{commId}
+               )
+    </insert>
+    <insert id="createCommunity" useGeneratedKeys="true" keyProperty="id">
+        insert into t_community
+        (c_name, c_about, c_creator, c_headerImg, c_rules)
+        values (#{comm.cName}, #{comm.cAbout}, #{comm.cCreator}, #{comm.cHeaderImg}, #{comm.cRules})
+    </insert>
+    <update id="updateCommPopulation">
+        update t_community
+        set c_population = c_population + #{p}
+        where id = #{commId}
+    </update>
+    <delete id="leaveComm">
+        delete from t_user_community
+        where user_id = #{user.id} and
+              community_id = #{commId}
+    </delete>
+
+    <select id="getCommunityList" resultType="com.zugangliu.finalproject.bean.Community">
+        select * from t_community
+        order by c_population DESC
+        limit 10
+    </select>
+    <select id="getCommunityListByUserId" resultType="com.zugangliu.finalproject.bean.Community">
+        select * from t_community
+        where id in (select community_id
+                     from t_user_community tuc
+                     where user_id = #{userId})
+    </select>
+    <select id="getCommunityById" resultType="com.zugangliu.finalproject.bean.Community">
+        select * from t_community
+        where id = #{commId}
+    </select>
+    <select id="getUserComm" resultType="java.lang.Integer">
+        select * from t_user_community
+        where user_id = #{user.id} and community_id = #{commId}
+    </select>
+    <select id="getAllComms" resultType="com.zugangliu.finalproject.bean.Community">
+        select id, c_name, c_about, c_creator
+        from t_community
+    </select>
+</mapper>

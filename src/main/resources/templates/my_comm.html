@@ -1,0 +1,121 @@
+<!DOCTYPE html>
+<html lang="en" xmlns:th="http://www.thymeleaf.org">
+<head>
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <meta name="description" content="">
+    <meta name="author" content="Mark Otto, Jacob Thornton, and Bootstrap contributors">
+    <meta name="generator" content="Hugo 0.88.1">
+    <title>Album example · Bootstrap v5.1</title>
+
+    <link rel="canonical" href="https://getbootstrap.com/docs/5.1/examples/album/">
+
+
+
+    <!-- Bootstrap core CSS -->
+    <link href="/bootstrap/css/bootstrap.min.css" rel="stylesheet">
+
+    <style>
+        .bd-placeholder-img {
+            font-size: 1.125rem;
+            text-anchor: middle;
+            -webkit-user-select: none;
+            -moz-user-select: none;
+            user-select: none;
+        }
+
+        @media (min-width: 768px) {
+            .bd-placeholder-img-lg {
+                font-size: 3.5rem;
+            }
+        }
+
+        .commHeader{
+            height: 225px;
+            width: 100%;
+            overflow: hidden;
+        }
+
+        .commHeader img{
+            position: relative;
+
+        }
+
+    </style>
+</head>
+<body>
+
+<div th:replace="common::#header">
+
+</div>
+
+<main>
+    <!-- header -->
+    <section class="py-5 text-center container">
+        <div class="row py-lg-5">
+            <div class="col-lg-6 col-md-8 mx-auto">
+                <h1 class="fw-light">Joined Communities</h1>
+                <p class="lead text-muted">Here are your favourite communities!</p>
+                <p>
+                    <!--<a href="#" class="btn btn-primary my-2">Main call to action</a>
+                    <a href="#" class="btn btn-secondary my-2">Secondary action</a>-->
+                </p>
+            </div>
+        </div>
+    </section>
+
+    <div class="album py-5 bg-light" id="commsAlbum">
+        <div class="container">
+            <div class="row row-cols-1 row-cols-sm-2 row-cols-md-3 g-3">
+                <div class="col" th:each="comm : ${listOfMyComm}">
+                    <div class="card shadow-sm">
+                        <!--<svg class="bd-placeholder-img card-img-top" width="100%" height="225"
+                             xmlns="http://www.w3.org/2000/svg" role="img" aria-label="Placeholder: Thumbnail"
+                             preserveAspectRatio="xMidYMid slice" focusable="false">
+                            <title th:text="${comm.cName}">Placeholder</title>
+                            <rect width="100%" height="100%" fill="#55595c"/>
+                            <text x="50%" y="50%" fill="#eceeef" dy=".3em" th:text="${comm.cName}">Thumbnail</text>
+                        </svg>-->
+                        <div class="commHeader">
+                            <a th:href="@{|/community/${comm.id}|}">
+                                <img style="width: 100%; height: 100%; object-fit: cover;" th:src="${comm.cHeaderImg}" th:title="${comm.cName}">
+                            </a>
+                        </div>
+
+                        <div class="card-body">
+                            <a th:href="@{|/community/${comm.id}|}"><h5 th:text="${comm.cName}"></h5></a>
+                            <p class="card-text" th:text="${comm.cAbout}"></p>
+                            <div class="d-flex justify-content-between align-items-center">
+                                <div class="btn-group">
+                                    <a th:href="@{|/community/${comm.id}|}"><button type="button" class="btn btn-sm btn-outline-secondary">Enter</button></a>
+                                </div>
+                                <small class="text-muted" th:text="${comm.cPopulation}+' people joined'">9 people</small>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+</main>
+
+<footer class="text-muted py-5">
+    <div class="container">
+        <p class="float-end mb-1">
+            <a href="#">Back to top</a>
+        </p>
+        <p class="mb-1"></p>
+        <p class="mb-0"><a th:href="@{/index}">Visit the homepage</a></p>
+    </div>
+</footer>
+
+
+<script src="/bootstrap/js/bootstrap.bundle.min.js"></script>
+<script src="/js/vue.js"></script>
+<script src="/bootstrap/js/jquery-3.6.0.min.js"></script>
+<script src="/js/axios.min.js"></script>
+<script src="/js/my_comm.js"></script>
+
+</body>
+</html>

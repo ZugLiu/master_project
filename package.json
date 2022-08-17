@@ -1,0 +1,8 @@
+{
+  "name": "FinalProject",
+  "version": "1.0.0",
+  "dependencies": {
+    "cropperjs": "^1.5.12",
+    "vue-datepicker": "^1.3.0"
+  }
+}

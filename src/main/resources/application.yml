@@ -1,0 +1,69 @@
+spring:
+#  mvc:
+#    static-path-pattern: /res/**
+  datasource:
+    url: jdbc:mysql://localhost:3306/reasonDB
+    username: root
+    password: 571428lzG
+
+    druid:
+      aop-patterns: com.zugangliu.finalproject.*  #监控SpringBean
+      filters: stat,wall     # 底层开启功能，stat（sql监控），wall（防火墙）
+
+      stat-view-servlet: # 配置监控页功能
+        enabled: true
+        login-username: admin
+        login-password: admin
+        resetEnable: false
+
+      web-stat-filter: # 监控web
+        enabled: true
+        urlPattern: /*
+        exclusions: '*.js,*.gif,*.jpg,*.png,*.css,*.ico,/druid/*'
+
+
+      filter:
+        stat: # 对上面filters里面的stat的详细配置
+          slow-sql-millis: 1000
+          logSlowSql: true
+          enabled: true
+        wall:
+          enabled: true
+          config:
+            drop-table-allow: false
+  web:
+    resources:
+      static-locations: [classpath:/static/]
+  mvc:
+    hiddenmethod:
+      filter:
+        enabled: true
+  servlet:
+    multipart:
+      max-file-size: 100MB
+      max-request-size: 150MB
+
+mybatis:
+  type-aliases-package: com.zugangliu.finalproject.bean # 不知道为什么，这个类别名一直无法生效
+  mapper-locations: classpath:mapper/*.xml
+  configuration:
+    map-underscore-to-camel-case: true
+    lazy-loading-enabled: false
+
+pagehelper:
+  helper-dialect: mysql # 数据库方言 mysql
+
+  # 分页参数合理化
+  # 默认是false。
+  # 启用合理化时，如果pageNum<1会查询第一页，如果pageNum>pages会查询最后一页；
+  # 禁用合理化时，如果pageNum<1或pageNum>pages会返回空数据
+  reasonable: true
+
+  # 支持通过 Mapper 接口参数来传递分页参数
+  # 默认值 false
+  support-methods-arguments: true
+
+  # 为了支持startPage(Object params)方法，增加了该参数来配置参数映射，
+  # 用于从对象中根据属性名取值
+  #  默认值为 countSql
+  params: count=countSql
