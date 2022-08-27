@@ -38,20 +38,21 @@ public class OptionServiceImpl implements OptionService{
      */
     @Override
     public String updateOptionVoteCount(int voterId, int optionId, int voteCountChange, int optionBelongTo) {
-        Integer vote = voteMapper.getVote(voterId, optionId);
+        Vote vote = voteMapper.getVote(voterId, optionId);
+
         if(voteCountChange==1){
             if(vote == null){
                 voteMapper.insertVote(voterId, optionId, optionBelongTo);
                 optionMapper.updateVoteCount(optionId, 1);
                 return "Vote successfully!";
-            }else if(vote == 1){
+            }else if(vote!=null){
                 // the user has already voted to the option, vote failed
                 return "You have already voted to this option. Vote rejected!";
             }
         }else if(voteCountChange==-1){
-            if(vote == null){
+            if(vote== null){
                 return "You haven't voted to this option before. Cancel rejected!";
-            }else if(vote == 1){
+            }else if(vote!= null){
                 voteMapper.deleteVote(voterId, optionId);
                 optionMapper.updateVoteCount(optionId, -1);
                 return "Vote canceled successfully!";

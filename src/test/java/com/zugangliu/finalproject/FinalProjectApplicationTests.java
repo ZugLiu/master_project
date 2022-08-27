@@ -44,8 +44,11 @@ class FinalProjectApplicationTests {
 	@Autowired
 	CommentMapper commentMapper;
 
+	/**
+	 * One's username cannot be the same as other user's
+	 */
 	@Test
-	void contextLoads() {
+	void testUserNameRepetitive() {
 		String input = "zug888";
 		QueryWrapper<User> wrapper = new QueryWrapper<>();
 		wrapper.eq("user_name", input);
@@ -53,18 +56,29 @@ class FinalProjectApplicationTests {
 		System.out.println(one);
 	}
 
+	/**
+	 * Test to get all topics from database.
+	 * This is a joined-table query.
+	 */
 	@Test
 	void testGetAllTopics(){
 		List<Topic> allTopics = topicMapper.getAllTopics();
 		allTopics.forEach(System.out::println);
 	}
 
+	/**
+	 * Test whether the number of comments of a topic can be retrieved from database correctly
+	 */
 	@Test
 	void testGetNumOfCommentsOfTopic(){
 		int commentNumOfTopic = topicMapper.getCommentNumOfTopic(3);
 		log.info(String.valueOf(commentNumOfTopic));
 	}
 
+	/**
+	 * Test whether the pagination can work as intended,
+	 * and see what information is included in PageInfo
+	 */
 	@Test
 	void testPagination(){
 		PageHelper.startPage(1, 2);
@@ -73,6 +87,11 @@ class FinalProjectApplicationTests {
 		log.info(topicPageInfo.toString());
 	}
 
+	/**
+	 * Know what the project root path is,
+	 * in order to save user uploaded files
+	 * @throws FileNotFoundException
+	 */
 	@Test
 	void testGetProjectRootPath() throws FileNotFoundException {
 		String path = ClassUtils.getDefaultClassLoader().getResource("static/img/upload/comm_header_img").getPath();
@@ -84,23 +103,18 @@ class FinalProjectApplicationTests {
 
 	}
 
+	/**
+	 * This is a joined-table query
+	 */
 	@Test
 	void testGetCommListByUserId(){
 		List<Community> communityListByUserId = communityMapper.getCommunityListByUserId(14);
 		log.info(communityListByUserId.toString());
 	}
 
-//	@Test
-//	void testVoteCRUD(){
-//		Integer get = voteMapper.getVote(1, 3);
-//		log.info(String.valueOf(get));
-//
-//		Integer insert = voteMapper.insertVote(2, 5);
-//		log.info(String.valueOf(insert));
-//
-//		Integer delete = voteMapper.deleteVote(3, 6);
-//		log.info(String.valueOf(delete));
-//	}
+	/**
+	 * Test insert a comment
+	 */
 	@Test
 	void testInsertComment(){
 		Comment comment = new Comment();
@@ -111,8 +125,11 @@ class FinalProjectApplicationTests {
 		commentMapper.insertComment(comment);
 	}
 
+	/**
+	 * This is a joined-table query.
+	 */
 	@Test
-	void testGetCommentThread(){
+	void testGetCommentThreadByTopicId(){
 		List<Comment> commentListByTopicId = commentService.getCommentListByTopicId(1);
 		log.info(commentListByTopicId.toString());
 	}

@@ -3,6 +3,7 @@ package com.zugangliu.finalproject.controller;
 import com.zugangliu.finalproject.bean.Option;
 import com.zugangliu.finalproject.bean.Topic;
 import com.zugangliu.finalproject.bean.User;
+import com.zugangliu.finalproject.bean.Vote;
 import com.zugangliu.finalproject.mapper.VoteMapper;
 import com.zugangliu.finalproject.service.OptionService;
 import com.zugangliu.finalproject.service.TopicService;
@@ -77,8 +78,8 @@ public class OptionController {
         for (Option o : options) {
             int oid = o.getId();
             int uid = currUser.getId();
-            Integer num = voteMapper.getVote(uid, oid);
-            if (num != null) {
+            Vote vote = voteMapper.getVote(uid, oid);
+            if (vote != null) {
                 // the user voted for this option
                 userVotedOptions.add(o);
             }
@@ -101,8 +102,8 @@ public class OptionController {
         for(Option o: options){
             int oid = o.getId();
             int uid = user.getId();
-            Integer num = voteMapper.getVote(uid, oid);
-            if (num != null) {
+            Vote vote = voteMapper.getVote(uid, oid);
+            if (vote.getId() != 0) {
                 // the user voted for this option
                 userVotedOptions.add(o);
             }

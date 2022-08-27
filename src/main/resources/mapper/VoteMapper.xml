@@ -14,7 +14,7 @@
         delete from t_vote
         where user_id = #{userId} and option_id = #{optionId}
     </delete>
-    <select id="getVote" resultType="java.lang.Integer">
+    <select id="getVote" resultType="com.zugangliu.finalproject.bean.Vote">
         select * from t_vote
         where user_id = #{userId} and option_id = #{optionId}
     </select>

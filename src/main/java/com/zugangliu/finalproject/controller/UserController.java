@@ -100,6 +100,7 @@ public class UserController {
             return "500;-1";
         }
 
+        //保存avatar至jar包同级目录下的/upload/user_avatar
         if(!avatar.isEmpty()){
             String originalFilename = avatar.getOriginalFilename();
             // get the directory of .jar

@@ -8,7 +8,7 @@ import java.util.List;
 public interface VoteMapper {
     int insertVote(@Param("userId") int userId, @Param("optionId") int optionId, @Param("optionBelongTo") int optionBelongTo);
 
-     Integer getVote(@Param("userId") int userId, @Param("optionId") int optionId);
+     Vote getVote(@Param("userId") int userId, @Param("optionId") int optionId);
 
      Integer deleteVote(@Param("userId") int userId, @Param("optionId") int optionId);
 
